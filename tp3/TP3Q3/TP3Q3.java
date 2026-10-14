@@ -240,13 +240,20 @@ class TP3Q1{
         }
         return vetor;
     }
-    public static Veiculo reconstruir(Veiculo[] vetor,int tam){
+    public static Veiculo[] reconstruir(Veiculo[] vetor,int tam){
         int i=0;
+        int cmp;
         while(hasFilho(vetor,i,tam)==true){
             int filho=getMaiorFilho(vetor,i,tam);
             if(vetor[i].getCo2()<vetor[filho].getCo2()){
                 swap(vetor,i,filho);
                 i=filho;
+            }
+            else if(vetor[i].getCo2()==vetor[filho].getCo2()){
+                cmp=vetor[i]Double.compareTo(vetor[filho]);
+                if(cmp<0) {swap(vetor,i,filho);
+                    i=filho;
+                }
             }
             else i=tam;
         }
