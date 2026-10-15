@@ -228,45 +228,48 @@ class Leitor{
 
 
 class TP3Q1{
-    public static void swap(Veiculo[]vetor,int a,int b){
-        Veiculo tmp=vetor[a];
-        vetor[a]=vetor[b];
-        vetor[b]=tmp;
-    }
-    public static Veiculo[] construir(Veiculo []vetor,int t){
-        int tam=vetor.length;
-        for(int i=tam-1;i>0 && vetor[i].getCo2()>vetor[i/2].getCo2();i=i/2){
-            swap(vetor,i,i/2);
-        }
-        return vetor;
-    }
-    public static Veiculo[] reconstruir(Veiculo[] vetor,int tam){
-        int i=0;
-        int cmp;
-        while(hasFilho(vetor,i,tam)==true){
-            int filho=getMaiorFilho(vetor,i,tam);
-            if(vetor[i].getCo2()<vetor[filho].getCo2()){
-                swap(vetor,i,filho);
-                i=filho;
-            }
-            else if(vetor[i].getCo2()==vetor[filho].getCo2()){
-                cmp=vetor[i]Double.compareTo(vetor[filho]);
-                if(cmp<0) {swap(vetor,i,filho);
-                    i=filho;
-                }
-            }
-            else i=tam;
-        }
-    }
-	public static Veiculo[] heap(Veiculo[] vetor){
-        for(int tam=1;tam<vetor.length;tam++){
-            vetor=construir(vetor,tam);
-        }
-        int tam=vetor.length;
-        while(tam>0){
-            swap(vetor,0,tam--);
-            reconstruir(vetor,tam);
-        }
+	public static void intercalar(Veiculo[] vetor,int esq,int meio,int dir){
+		int nEsq=meio-esq+1;
+		int nDir=dir-meio;
+		Veiculo[] vetEsq=new Veiculo[nEsq];
+		Veiculo[] vetDir=new Veiculo[nDir];
+		//inicializar cada vetor
+		int iEsq,iDir,i;
+		for(iEsq=0;iEsq<nEsq;iEsq++){
+			vetEsq[iEsq]=vetor[esq+iEsq];
+		}
+		for(iDir=0;iDir<nDir;iDir++){
+			vetDir[iDir]=vetor[iDir+meio+1];
+		}
+		//intercalacao
+		iDir=0;
+		iEsq=0;
+		i=esq;
+		while(iEsq<nEsq && iDir<nDir){
+			if(vetEsq[iEsq].getConsumoCidade()<vetDir[iDir].getConsumoCidade()) 
+				vetor[i++]=vetEsq[iEsq++];
+			else if(vetEsq[iEsq].getConsumoCidade()>vetDir[iDir].getConsumoCidade())
+				vetor[i++]=vetDir[iDir++];
+			else{
+				if(vetEsq[iEsq].getCategoria().compareToIgnoreCase(vetDir[iDir].getCategoria())>0) 
+					vetor[i++]=vetDir[iDir++];
+				else vetor[i++]=vetEsq[iEsq++];
+			}
+		}
+		while(iEsq<nEsq){
+			vetor[i++]=vetEsq[iEsq++];
+		}
+		while(iDir<nDir){
+			vetor[i++]=vetDir[iDir++];
+		}
+	}
+	public static void merge(Veiculo[] vetor,int esq,int dir){
+		if(esq<dir){
+			int meio=(esq+dir)/2;
+			merge(vetor,esq,meio);
+			merge(vetor,meio+1,dir);
+			intercalar(vetor,esq,meio,dir);
+		}
 	}
 	public static void main(String[] args){
 		Veiculo[] array=Leitor.ler();
@@ -285,9 +288,13 @@ class TP3Q1{
 			numeroId=sc.nextInt();
 		}
 		sc.close();
-		heap(vetor,0,j-1);
+		Veiculo[] fim=new Veiculo[j];
 		for(int i=0;i<j;i++){
-			System.out.println(vetor[i].format());
+			fim[i]=vetor[i];
+		}
+		merge(fim,0,j-1);
+		for(int i=0;i<j;i++){
+			System.out.println(fim[i].format());
 		}
 	}
 }

@@ -226,70 +226,136 @@ class Leitor{
 	}
 }
 
+class Celula{
+	Veiculo elemento;
+	Celula ant,prox;
+	Celula(){
+		ant=prox=null;
+	}
+	Celula(Veiculo x){
+		ant=prox=null;
+		elemento=x;
+	}
+}
 
-class TP3Q1{
-	public static void intercalar(Veiculo[] vetor,int esq,int meio,int dir){
-		int nEsq=meio+1-esq;
-		int nDir=dir-meio;
-		Veiculo[] vetEsq=new Veiculo[nEsq];
-		Veiculo[] vetDir=new Veiculo[nDir];
-		//inicializar cada vetor
-		int iEsq,iDir,i;
-		for(iEsq=0;iEsq<nEsq;iEsq++){
-			vetEsq[iEsq]=vetor[esq+iEsq];
+class Lista{
+	Celula primeiro,ultimo;
+	Lista(){
+		Celula cabeca=new Celula();
+		primeiro=cabeca;
+		ultimo=primeiro;
+	}
+	public void inserirInicio(Veiculo x) throws Exception{
+		Celula nova=new Celula(x);
+		nova.prox=primeiro.prox;
+		nova.ant=primeiro;
+		primeiro.prox=nova;
+		if(primeiro==ultimo) ultimo=nova;
+		else nova.prox.ant=nova;
+	}
+	public Veiculo removerInicio() throws Exception{
+		if(primeiro==ultimo) throw new Exception("erro");
+		Celula tmp=primeiro.prox;
+		Veiculo resp=tmp.elemento;
+		primeiro.prox=tmp.prox;
+		if(tmp==ultimo) ultimo=primeiro;
+		else primeiro.prox.ant=primeiro;
+		tmp.prox=null;
+		tmp.ant=null;
+		tmp=null;
+		return resp;
+	}
+	public void inserirFim(Veiculo x) throws Exception{
+		ultimo.prox=new Celula(x);
+		ultimo.prox.ant=ultimo;
+		ultimo=ultimo.prox;
+	}
+	public Veiculo removerFim() throws Exception{
+		if(primeiro==ultimo) throw new Exception("erro");
+		Veiculo resp=ultimo.elemento;
+		ultimo=ultimo.ant;
+		ultimo.prox.ant=null;
+		ultimo.prox=null;
+		return resp;
+	}
+	public void inserir(Veiculo x,int pos) throws Exception{
+		Celula i=primeiro;
+		for(int j=0;j<pos;j++,i=i.prox);
+		Celula nova=new Celula(x);
+		nova.prox=i.prox;
+		nova.ant=i;
+		i.prox.ant=nova;
+		i.prox=nova;
+		i.ant=null;
+		i=null;
+		nova=null;
+	}
+	public Veiculo remover(int pos) throws Exception{
+		if(primeiro==ultimo) throw new Exception("erro");
+		Celula i=primeiro.prox;
+		for(int j=0;j<pos;j++,i=i.prox);
+		Veiculo resp=i.elemento;
+		i.ant.prox=i.prox;
+		if(i==ultimo) ultimo=i.ant;
+		else i.prox.ant=i.ant;
+		i.prox=i=null;
+		return resp;
+	}
+	public void mostrar(){
+		for(Celula i=primeiro.prox;i!=null;i=i.prox){
+			System.out.println(i.elemento.format());
 		}
-		for(iDir=0;iDir<nDir;iDir++){
-			vetDir[iDir]=vetor[iDir+meio+1];
-		}
-		//intercalacao
-		iDir=iEsq=0;
-		i=esq;
-		while(iEsq<nEsq && iDir<nDir){
-			if(vetEsq[iEsq].getConsumoCidade()<vetDir[iDir].getConsumoCidade()) 
-				vetor[i++]=vetEsq[iEsq++];
-			else if(vetEsq[iEsq].getConsumoCidade()>vetDir[iDir].getConsumoCidade())
-				vetor[i++]=vetDir[iDir++];
-			else{
-				if(vetEsq[iEsq].getCategoria().compareTo(vetDir[iDir].getCategoria())<0) 
-					vetor[i++]=vetEsq[iEsq++];
-				else vetor[i++]=vetDir[iDir++];
+	}
+	public void quick(Celula esq,Celula dir){
+		if(esq==dir || esq==null || dir==null) return;	
+		Veiculo pivo=esq.elemento;
+		Celula i=esq,j=dir;
+		while(j.prox!=i && i!=null && j!=null){
+			while(i!=null && (i.elemento.getConsumoEstrada()<pivo.getConsumoEstrada() || (i.elemento.getConsumoEstrada()==pivo.getConsumoEstrada() && (i.elemento.getMarca().compareTo(pivo.getMarca())<0)))) i=i.prox;
+			while(j!=null && (j.elemento.getConsumoEstrada()>pivo.getConsumoEstrada() || (j.elemento.getConsumoEstrada()==pivo.getConsumoEstrada() && (j.elemento.getMarca().compareTo(pivo.getMarca())>0)))) j=j.ant;
+			if(j.prox!=i){
+				Veiculo tmp=i.elemento;
+				i.elemento=j.elemento;
+				j.elemento=tmp;
+				i=i.prox;
+				j=j.ant;
 			}
 		}
-		while(iEsq<nEsq){
-			vetor[i++]=vetEsq[iEsq++];
-		}
-		while(iDir<nDir){
-			vetor[i++]=vetDir[iDir++];
-		}
+
+		if(j!=esq && esq!=null) quick(esq,j);
+		if(i!=dir && dir!=null) quick(i,dir);
 	}
-	public static void merge(Veiculo[] vetor,int esq,int dir){
-		if(esq<dir){
-			int meio=(esq+dir)/2;
-			merge(vetor,esq,meio);
-			merge(vetor,meio+1,dir);
-			intercalar(vetor,esq,meio,dir);
+}
+
+
+class Q5{
+	public static Veiculo buscarVeiculo(Veiculo array[],int id){
+		for(int i=0;i<array.length;i++){
+			if(array[i].getId()==id) return array[i];
 		}
+		return null;
 	}
 	public static void main(String[] args){
+		try{
 		Veiculo[] array=Leitor.ler();
 		Scanner sc=new Scanner(System.in);
-		Veiculo[] vetor=new Veiculo[500];
-		int j=0;
+		Lista lista=new Lista();
+		Veiculo[]removidos;
 		int numeroId=sc.nextInt();
 		while(numeroId!=-1){
 			for(int i=0;i<array.length;i++){
 				if(array[i].getId()==numeroId){
-					vetor[j]=array[i];
+					lista.inserirFim(array[i]);
 					i=array.length;
-					j++;
 				}
 			}
 			numeroId=sc.nextInt();
 		}
-		sc.close();
-		merge(vetor,0,j-1);
-		for(int i=0;i<j;i++){
-			System.out.println(vetor[i].format());
+		lista.quick(lista.primeiro.prox,lista.ultimo);
+		lista.mostrar();
+		}
+		catch(Exception e){
+			System.out.println(e.getMessage());
 		}
 	}
 }

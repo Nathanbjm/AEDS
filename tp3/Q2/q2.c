@@ -125,19 +125,25 @@ int comparar(char *s,char*t){
 }
 
 
-
-void ordenar(Veiculo array[],int tam){
-	int menor=0;
-	for(int i=0;i<tam-1;i++){
-		menor=i;
-		for(int j=i+1;j<tam;j++){
-			if(comparar(array[menor].modelo,array[j].modelo)>0)
-				menor=j;
+void swap(Veiculo vetor[],int i,int j){
+	Veiculo tmp=vetor[i];
+	vetor[i]=vetor[j];
+	vetor[j]=tmp;
+}
+void quick(Veiculo array[],int esq,int dir){
+	int meio=(esq+dir)/2;
+	int i=esq,j=dir;
+	Veiculo pivo=array[meio];
+	while(i<=j){
+		while(array[i].consumoEstrada<pivo.consumoEstrada || (array[i].consumoEstrada==pivo.consumoEstrada &&(comparar(array[i].marca,pivo.marca)<0))) i++;
+		while(array[j].consumoEstrada>pivo.consumoEstrada || (array[j].consumoEstrada==pivo.consumoEstrada && (comparar(array[j].marca,pivo.marca)>0))) j--;
+		if(i<=j){
+			swap(array,i,j);
+			i++;j--;
 		}
-		Veiculo tmp=array[i];
-		array[i]=array[menor];
-		array[menor]=tmp;
 	}
+	if(i<dir) quick(array,i,dir);
+	if(j>esq) quick(array,esq,j);
 }
 
 
@@ -156,7 +162,7 @@ int main() {
             }
         }
     }
-    ordenar(temporario,j);
+    quick(temporario,0,j-1);
     for(int i=0;i<j;i++){
 	    formatVeiculo(temporario[i]);
     }
