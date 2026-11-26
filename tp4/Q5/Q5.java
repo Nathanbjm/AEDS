@@ -1,6 +1,5 @@
 import java.util.*;
 import java.io.*;
-import java.io.FileReader;
 class Veiculo{
 	private int id;
 	private String marca;
@@ -226,28 +225,6 @@ class Leitor{
 	}
 }
 
-
-class TP2Q4{
-	public static int comparar(String a,String b){
-		int i=0;
-		int tamanho;
-		if(a.length()<b.length()) tamanho=a.length();
-		else tamanho=b.length();
-		while(i!=tamanho){
-			char A=a.charAt(i);
-			char B=b.charAt(i);
-			if(a.charAt(i)>='A' && a.charAt(i) <='Z'){
-				A=(char)(a.charAt(i)+32);
-			}
-			if(b.charAt(i)>='A' && b.charAt(i)<='Z'){
-				B=(char)(b.charAt(i)+32);
-			}
-			if(A!=B) return A-B;
-			i++;
-		}
-		return a.length()-b.length();
-	}
-
 	class No{
 		Veiculo elemento;
 		No esq,dir;
@@ -307,7 +284,7 @@ class TP2Q4{
     }
 }
 
-
+public class Q5{
 	public static void main(String[] args){
 		Veiculo[] array=Leitor.ler();
 		Scanner sc=new Scanner(System.in);
