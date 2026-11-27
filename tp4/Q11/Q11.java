@@ -1,4 +1,7 @@
+package tp4.Q11;
 import java.util.*;
+
+
 import java.io.*;
 class Veiculo{
 	private int id;
@@ -221,58 +224,66 @@ class Leitor{
 
 	
 class Hash{
-    Veiculo[] tabela;
+    Lista[] tabela;
 	Hash(int tam){
-		tabela=new Veiculo[tam];
+		tabela=new Lista[tam];
 		for(int i=0;i<tam;i++){
-			tabela[i]=null;
+			tabela[i]=new Lista();
 		}
 	}
-	int hash(String modelo){
+	int hash(int soma){
+		return soma%31;
+	}
+	void inserir(Veiculo x){
+		int pos=hash(somar(x.getModelo()));
+		tabela[pos].inserir(x);
+	}
+
+	int somar(String modelo){
 		int soma=0;
 		for(int i=0;i<modelo.length();i++){
 			soma+=modelo.charAt(i);
 		}
-		return soma%31;
+		return soma;
 	}
 	void pesquisar(String modelo){
-		int pos=hash(modelo)%31;
-		if(tabela[pos]==null) System.out.println("-1");
-		else{
-			       if(tabela[pos].getModelo().compareTo(modelo)==0){
-					System.out.println(pos+" "+tabela[pos].format());
-				}
-				else{
-					int i=31;
-					while(i<50 && (tabela[i]==null || tabela[i].getModelo().compareTo(modelo)!=0)){	
-						i++;
-					}
-
-				if(i>=50) System.out.println("-1");
-				else System.out.println(i+" "+tabela[i].format());
-			}
-		}
-    }
-
-	void inserir(Veiculo x){
-		int pos=hash(x.getModelo())%31;
-		if(tabela[pos]==null) tabela[pos]=x;
-		else{
-			int i=31;
-			while(i<50 && tabela[i]!=null){
-				i++;
-			}
-			if(i>49) System.out.println(x.getModelo());
-			else tabela[i]=x;
-		}
-	}
+		int pos=hash(somar(modelo));
+		Celula i=tabela[pos].inicio.prox;
+		while(i!=null && i.elemento.getModelo().compareTo(modelo)!=0) i=i.prox;
+		if(i!=null) System.out.println(pos +" "+ i.elemento.format());
+		else System.out.println("-1");
+        }
 }
 
-public class Q9{
+   class Lista{
+	   Celula inicio,ultimo;
+	   Lista(){
+		   Celula cabeca=new Celula();
+		   inicio=ultimo=cabeca;
+	   }
+	   void inserir(Veiculo x){
+		   ultimo.prox=new Celula(x);
+		   ultimo=ultimo.prox;
+	   }
+   }
+
+   class Celula{
+	   Veiculo elemento;
+	   Celula prox;
+	   Celula(){
+		   prox=null;
+	   }
+	   Celula(Veiculo x){
+		   elemento=x;
+		   prox=null;
+	   }
+   }
+
+public class Q11{
 	public static void main(String[] args){
 		Veiculo[] array=Leitor.ler();
 		Scanner sc=new Scanner(System.in);
-		Hash hash=new Hash(50);
+		Hash hash=new Hash(31);
 		int numeroId=sc.nextInt();
 		while(numeroId!=-1){
 			for(int i=0;i<array.length;i++){
@@ -292,3 +303,4 @@ public class Q9{
 
 	}
 }
+

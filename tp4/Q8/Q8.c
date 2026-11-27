@@ -117,7 +117,7 @@ void retirarChar(char string[]){
 
 typedef struct No{
 	Veiculo elemento;
-	No * esq, * dir;
+	struct No * esq, * dir;
 	bool cor;
 }No;
 
@@ -139,9 +139,30 @@ Arvore novaArvore(){
 	return arvore;
 }
 
+
+No *novoNo(Veiculo x);
+
+void inserir(Veiculo x, Arvore *a);
+
+void inserirRec(Veiculo x, No *bisavo, No *avo, No *pai, No *i, Arvore *a);
+
+bool noEhDoTipoQuatro(No *i);
+
+void fragmentar(No *i);
+
+void balancear(No *bisavo, No *avo, No *pai, No *i, Arvore *a);
+
+No *rotacaoEsq(No *no);
+
+No *rotacaoDir(No *no);
+
+void pesquisar(char *modelo, Arvore *a);
+
+bool pesquisarRec(char *modelo, Arvore *a, No *i);
+
 	void inserir(Veiculo x,Arvore * a){
 		if(a->raiz==NULL) a->raiz=novoNo(x);
-		else inserirRec(x,NULL,NULL,NULL,a->raiz);
+		else inserirRec(x,NULL,NULL,NULL,a->raiz,a);
 		a->raiz->cor=false;
 	}
 	void inserirRec(Veiculo x,No * bisavo, No * avo, No * pai, No * i,Arvore * a){
@@ -159,7 +180,7 @@ Arvore novaArvore(){
 			else if(pai->cor) balancear(bisavo,avo,pai,i,a);
 			}
 			if(strcmp(i->elemento.modelo,x.modelo)>0) inserirRec(x,avo,pai,i,i->esq,a);
-			else inserirRec(x,avo,pai,i,i->dir,a);
+			else if(strcmp(i->elemento.modelo,x.modelo)<0) inserirRec(x,avo,pai,i,i->dir,a);
 
 		}
 	}
@@ -175,11 +196,11 @@ void fragmentar(No * i){
 
 void balancear(No * bisavo, No * avo, No * pai, No * i,Arvore * a){
 	if(strcmp(avo->elemento.modelo,pai->elemento.modelo)<0){
-		if(strcmp(pai->elemento.modelo,i->elemento.modelo)>0) pai=rotacaoDir(pai);
+		if(strcmp(pai->elemento.modelo,i->elemento.modelo)>0) avo->dir=rotacaoDir(pai);
 		avo=rotacaoEsq(avo);
 	}
 	else{
-		if(strcmp(pai->elemento.modelo,i->elemento.modelo)<0) pai=rotacaoEsq(pai);
+		if(strcmp(pai->elemento.modelo,i->elemento.modelo)<0) avo->esq=rotacaoEsq(pai);
 		avo=rotacaoDir(avo);
 	}
 	if(bisavo==NULL) a->raiz=avo;
@@ -190,7 +211,7 @@ void balancear(No * bisavo, No * avo, No * pai, No * i,Arvore * a){
 
 }
 
-No * rotacionarEsq(No * no){
+No * rotacaoEsq(No * no){
 	No * noDir=no->dir;
 	No * noDirEsq=noDir->esq;
 	noDir->esq=no;
@@ -198,7 +219,7 @@ No * rotacionarEsq(No * no){
 	return noDir;
 }
 
-No * rotacionarDir(No * no){
+No * rotacaoDir(No * no){
 	No * noEsq=no->esq;
 	No *noEsqDir=noEsq->dir;
 	noEsq->dir=no;
@@ -230,6 +251,13 @@ bool pesquisarRec(char * modelo,Arvore * a,No * i){
 	return aux;
 }
 
+void caminharEmOrdem(No * i){
+	if(i!=NULL){
+		caminharEmOrdem(i->esq);
+		formatVeiculo(i->elemento);
+		caminharEmOrdem(i->dir);
+	}
+}
 int main() {
 	Veiculo array[500];
 	Arvore a=novaArvore();
@@ -243,9 +271,9 @@ int main() {
 			}
 		}
 	}
-	char tmp;
-	scanf("%c",&tmp);
+	
 	char modelo[1000];
+	getchar();
 	fgets(modelo,1000,stdin);
 	retirarChar(modelo);
 	while(strcmp(modelo,"FIM")!=0){
@@ -253,4 +281,5 @@ int main() {
 		fgets(modelo,1000,stdin);
 		retirarChar(modelo);
 	}
+	caminharEmOrdem(a.raiz);
 }

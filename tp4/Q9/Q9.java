@@ -1,4 +1,3 @@
-package tp4.Q9;
 import java.util.*;
 import java.io.*;
 class Veiculo{
@@ -240,18 +239,17 @@ class Hash{
 		int pos=hash(modelo)%31;
 		if(tabela[pos]==null) System.out.println("-1");
 		else{
-			if(tabela[pos].getModelo().compareTo(modelo)==0){
-				System.out.println(pos+" "+tabela[pos].format());
-			}
-			else{
-				int i;
-				for(i=31;i<50;i++){
-					if(tabela[i].getModelo().compareTo(modelo)==0){
-						System.out.println(i+" "+tabela[pos].format());
-						i=51;
-					}
+			       if(tabela[pos].getModelo().compareTo(modelo)==0){
+					System.out.println(pos+" "+tabela[pos].format());
 				}
-				if(i==50) System.out.println("-1");
+				else{
+					int i=31;
+					while(i<50 && (tabela[i]==null || tabela[i].getModelo().compareTo(modelo)!=0)){	
+						i++;
+					}
+
+				if(i>=50) System.out.println("-1");
+				else System.out.println(i+" "+tabela[i].format());
 			}
 		}
     }
@@ -260,12 +258,12 @@ class Hash{
 		int pos=hash(x.getModelo())%31;
 		if(tabela[pos]==null) tabela[pos]=x;
 		else{
-			int i;
-			for(i=31;i<50;i++){
-				if(tabela[i]==null) tabela[i]=x;
-				i=51;
+			int i=31;
+			while(i<50 && tabela[i]!=null){
+				i++;
 			}
-			if(i==50) System.out.println(x.format());
+			if(i>49) System.out.println(x.getModelo());
+			else tabela[i]=x;
 		}
 	}
 }
@@ -284,12 +282,13 @@ public class Q9{
 			}
 			numeroId=sc.nextInt();
 		}
-		sc.close();
+		if(sc.hasNextLine()) sc.nextLine();
 		String modelo=sc.nextLine();
 		while(modelo.compareTo("FIM")!=0){
 			hash.pesquisar(modelo);
 			modelo=sc.nextLine();
 		}
+		sc.close();
 
 	}
 }
